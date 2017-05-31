@@ -8,5 +8,6 @@ Quickly open calibre books in [StumpWM](https://stumpwm.github.io/).
 (load-module "swm-calibre")
 (setf swm-calibre:*calibre-root* "<path-to-calibre-dir-with-trailing-'/'>")
 
-(open-book)
+;; Call command
+;; open-book "search-term"
 ```
