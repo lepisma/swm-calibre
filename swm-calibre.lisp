@@ -2,7 +2,6 @@
 
 (in-package #:swm-calibre)
 
-;;; "swm-calibre" goes here. Hacks and glory await!
 (export '(*calibre-root* open-book))
 
 (defvar *calibre-root* nil "Path to calibre root directory")
@@ -16,10 +15,6 @@
                               "zip")
   "Preference order for book formats")
 
-(defmacro concat-str (&rest rest)
-  "Concat string"
-  `(concatenate 'string ,@rest))
-
 (defun replace-str (string replacements)
   (if replacements
       (let ((rep (car replacements)))
@@ -30,9 +25,9 @@
 
 (defun get-sql-stmt (query)
   "Return sql statement for the given query"
-  (concat-str
-   "SELECT title, author_sort, path FROM books "
-   "WHERE lower(title || ' ' || author_sort) like '%' || lower('" query "') || '%'"))
+  (cl-strings:join
+   (list "SELECT title, author_sort, path FROM books "
+	 "WHERE lower(title || ' ' || author_sort) like '%' || lower('" query "') || '%'")))
 
 (defun fix-path-string (path-str)
   (replace-str path-str '((" " "\\ ")
@@ -42,28 +37,28 @@
                           ("'" "\\'"))))
 
 (defun get-calibre-path (item-path)
-  (fix-path-string (concat-str *calibre-root* item-path)))
+  (fix-path-string (cl-strings:join (list *calibre-root* item-path))))
 
 (defun search-in-calibre (query)
   (let* ((calibre-db (get-calibre-path "metadata.db"))
-         (command (concat-str "sqlite3 " calibre-db " \"" (get-sql-stmt query) "\""))
+         (command (cl-strings:join (list "sqlite3 " calibre-db " \"" (get-sql-stmt query) "\"")))
          (command-output (cl-strings:clean (run-shell-command command t) :char #\Linefeed)))
     (mapcar (lambda (x) (cl-strings:split x "|")) (cl-strings:split command-output #\Linefeed))))
 
 (defun search-menu-table (query)
   (mapcar (lambda (res) (list
-                    (concat-str (first res) " - " (second res))
+                    (cl-strings:join (list (first res) " - " (second res)))
                     (third res))) (search-in-calibre query)))
 
 (defun format-available (book-path format)
-  (let ((ls-out (run-shell-command (concat-str "ls " book-path "/*." format) t)))
+  (let ((ls-out (run-shell-command (cl-strings:join (list "ls " book-path "/*." format)) t)))
     (if (string-equal "" ls-out) NIL (cl-strings:clean ls-out :char #\Linefeed))))
 
 (defun open-preferred-format (book-path &optional format-list)
   (if format-list
       (let ((availability (format-available book-path (car format-list))))
         (if availability
-            (run-shell-command (concat-str "xdg-open " (fix-path-string availability)))
+            (run-shell-command (cl-strings:join (list "xdg-open " (fix-path-string availability))))
             (open-preferred-format book-path (cdr format-list))))
       (message "No suitable book format found.")))
 
