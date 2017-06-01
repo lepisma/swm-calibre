@@ -67,9 +67,12 @@
     (open-preferred-format book-path *format-preference*)))
 
 (defcommand open-book (search-term) ((:string "Enter search term: "))
-  (let* ((result-table (search-menu-table search-term))
-         (hits (length result-table)))
-    (cond
-      ((null (second (first result-table))) (message "No books found"))
-      ((= 1 hits) (xdg-open-book (car result-table)))
-      (t (xdg-open-book (select-from-menu (current-screen) result-table "Filter book:"))))))
+  (if *calibre-root*
+      (progn
+	      (let* ((result-table (search-menu-table search-term))
+               (hits (length result-table)))
+	        (cond
+	          ((null (second (first result-table))) (message "No books found"))
+	          ((= 1 hits) (xdg-open-book (car result-table)))
+	          (t (xdg-open-book (select-from-menu (current-screen) result-table "Filter book:"))))))
+      (message "*calibre-root* directory not set")))
