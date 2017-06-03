@@ -6,7 +6,7 @@ Quickly open calibre books in [StumpWM](https://stumpwm.github.io/).
 ;; Clone the repo to StumpWM's load path (or add-to-load-path)
 
 (load-module "swm-calibre")
-(setf swm-calibre:*calibre-root* "<path-to-calibre-dir-with-trailing-'/'>")
+(setf swm-calibre:*calibre-root* #p"<path-to-calibre-dir>")
 
 ;; Call command
 ;; open-book "search-term"
