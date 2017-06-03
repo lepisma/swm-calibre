@@ -34,10 +34,9 @@
 
 (defun get-book-format (book-path format)
   "Return file path for given format. NIL if not found."
-  (let ((files-found (directory (make-pathname :name :wild
-                                               :type format
-                                               :defaults book-path))))
-    (if files-found (first files-found) nil)))
+  (first (directory (make-pathname :name :wild
+                                   :type format
+                                   :defaults book-path))))
 
 (defun open-preferred-format (book-path &optional format-list)
   "Loop over format-list to open the book."
@@ -54,13 +53,13 @@
     (open-preferred-format (pathname-as-directory book-path) *format-preference*)))
 
 (defcommand open-book (search-term) ((:string "Enter search term: "))
-  "Main command exposed for opening books."
+  "Main command for opening books."
   (if *calibre-root*
       (progn
-	      (let* ((menu-table (get-menu-table search-term))
+        (let* ((menu-table (get-menu-table search-term))
                (hits (length menu-table)))
-	        (cond
-	          ((null (second (first menu-table))) (message "No books found"))
-	          ((= 1 hits) (xdg-open-book (car menu-table)))
-	          (t (xdg-open-book (select-from-menu (current-screen) menu-table "Filter book:"))))))
+          (cond
+            ((null (second (first menu-table))) (message "No books found"))
+            ((= 1 hits) (xdg-open-book (car menu-table)))
+            (t (xdg-open-book (select-from-menu (current-screen) menu-table "Filter book:"))))))
       (message "*calibre-root* directory not set")))
