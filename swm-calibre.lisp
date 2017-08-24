@@ -56,11 +56,10 @@
   "Main command for opening books."
   (if search-term
       (if *calibre-root*
-          (progn
-            (let* ((menu-table (get-menu-table search-term))
-                   (hits (length menu-table)))
-              (condition
-               ((null (second (first menu-table))) (message "No books found"))
-               ((= 1 hits) (xdg-open-book (car menu-table)))
-               (t (xdg-open-book (select-from-menu (current-screen) menu-table "Filter book:"))))))
+          (let* ((menu-table (get-menu-table search-term))
+                 (hits (length menu-table)))
+            (cond
+              ((null (second (first menu-table))) (message "No books found"))
+              ((= 1 hits) (xdg-open-book (car menu-table)))
+              (t (xdg-open-book (select-from-menu (current-screen) menu-table "Filter book:")))))
           (message "*calibre-root* directory not set"))))
